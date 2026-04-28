@@ -82,6 +82,10 @@
         .col-hidden { display: none !important; }
         .col-thu { min-width: 80px !important; text-align: center; font-weight: 700 !important; color: #1565c0 !important; }
 
+        /* CUSTOM COLUMN WIDTHS */
+        .col-noidung-chitiet { min-width: 250px !important; width: auto !important; }
+        .col-bgh-khoi { width: 1% !important; white-space: normal !important; min-width: 90px !important; text-align: center; }
+
         table.custom-schedule td.col-sticky-date, table.custom-schedule th.col-sticky-date { 
             background-color: #f8fbff; font-weight: 700; text-align: center; color: #1565c0; 
             position: sticky; left: 0; z-index: 10; border-right: 2px solid #b0bec5; 
@@ -142,7 +146,7 @@
 /**
  * AI SUPER-SCHEDULER V10.8 - BGH HIGHLIGHT EXPANSION
  * - Feature: Applied BGH tag highlighting to BOTH "Chủ trì" and "Thành phần" columns.
- * - Logic: Updated column index check in rendering loop.
+ * - Feature: Adjusted column width for "Nội dung chi tiết" and "BGH-Khối quản lý".
  */
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbysvLenfsJak8UG4UHJfqBG1Kao-VFHVQgJ3MlK6V4VvZi0hGP6wMNEGs0Gk7DOJMiDig/exec'; 
@@ -347,10 +351,11 @@ const App = {
             
             const idxTime = headers.findIndex(c => c.toLowerCase().includes('thời gian'));
             const idxChuTri = headers.findIndex(c => c.toLowerCase().includes('chủ trì'));
-            // --- THÊM: Tìm cột Thành Phần ---
             const idxThanhPhan = headers.findIndex(c => c.toLowerCase().includes('thành phần'));
             const idxThu = headers.findIndex(c => c.toLowerCase().includes('thứ'));
             const idxNgay = headers.findIndex(c => c.toLowerCase().includes('ngày'));
+            const idxNDCT = headers.findIndex(c => c.toLowerCase().includes('nội dung chi tiết'));
+            const idxBGH = headers.findIndex(c => c.toLowerCase().includes('bgh-khối'));
 
             let lastSeenDate = '';
             let lastSeenDay = '';
@@ -361,6 +366,8 @@ const App = {
                 if (i === idxNgay) extraClass += ' col-sticky-date'; 
                 if (i === idxThu) extraClass += ' col-thu';
                 if (i === idxTime) extraClass += ' col-time';
+                if (i === idxNDCT) extraClass += ' col-noidung-chitiet';
+                if (i === idxBGH) extraClass += ' col-bgh-khoi';
                 return `<th class="${extraClass}" style="${displayStyle}">${h}</th>`;
             }).join('');
 
@@ -381,7 +388,6 @@ const App = {
                     if (spanMap[rIdx] && spanMap[rIdx][c] === 0) return;
                     let content = row[c] || '';
                     
-                    // --- LOGIC MỚI: Áp dụng Tag BGH cho cả Chủ trì VÀ Thành phần ---
                     if(c === idxChuTri || c === idxThanhPhan) {
                         content = content.replace(TAG_REGEX, m => `<span class="${TAG_COLOR_MAP[m]}">${m}</span>`);
                     } else if (content === 'BGH') {
@@ -391,6 +397,9 @@ const App = {
                     let cls = (c === idxNgay) ? 'col-sticky-date' : (c === idxTime ? 'col-time' : '');
                     if (c === idxThu) cls += ' col-thu';
                     if (c === idxChuTri) cls += ' align-center';
+                    if (c === idxNDCT) cls += ' col-noidung-chitiet';
+                    if (c === idxBGH) cls += ' col-bgh-khoi';
+                    
                     let rowspan = (spanMap[rIdx][c] > 1) ? ` rowspan="${spanMap[rIdx][c]}"` : '';
                     
                     bodyHtml += `<td class="${cls}"${rowspan} style="${displayStyle}">${content.replace(/\n/g, '<br>')}</td>`;
@@ -440,7 +449,3 @@ App.init();
 </script>
 </body>
 </html>
-
-
-
-
